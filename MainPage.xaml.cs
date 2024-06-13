@@ -1,4 +1,6 @@
-﻿namespace matrix_mess_less;
+﻿using Plugin.NFC;
+
+namespace matrix_mess_less;
 
 public partial class MainPage : ContentPage
 {
@@ -7,18 +9,20 @@ public partial class MainPage : ContentPage
 	public MainPage()
 	{
 		InitializeComponent();
+
+		CrossNFC.Current.OnMessageReceived += Current_OnMessageReceived;
 	}
 
-	private void OnCounterClicked(object sender, EventArgs e)
+    private void Current_OnMessageReceived(ITagInfo tagInfo)
+    {
+		this.CounterBtn.Text = "Tag received: " + Convert.ToBase64String(tagInfo.Identifier);
+
+		var records = tagInfo.Records;
+    }
+
+    private void OnCounterClicked(object sender, EventArgs e)
 	{
-		count++;
-
-		if (count == 1)
-			CounterBtn.Text = $"Clicked {count} time";
-		else
-			CounterBtn.Text = $"Clicked {count} times";
-
-		SemanticScreenReader.Announce(CounterBtn.Text);
+		CrossNFC.Current.StartListening();
 	}
 }
 
